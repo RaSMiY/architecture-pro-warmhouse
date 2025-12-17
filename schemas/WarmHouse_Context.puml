@@ -1,0 +1,28 @@
+@startuml
+title Контекст системы "Тёплый дом" — C4 Diagram
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+top to bottom direction
+' LAYOUT_LEFT_RIGHT()
+
+hide stereotype
+!define osaPuml https://raw.githubusercontent.com/Crashedmind/PlantUML-opensecurityarchitecture2-icons/master
+!include osaPuml/Common.puml
+!include osaPuml/User/all.puml
+!include osaPuml/Hardware/all.puml
+!include osaPuml/Misc/all.puml
+!include osaPuml/Server/all.puml
+!include osaPuml/Site/all.puml
+
+' Пользователи
+osa_user_large_group(users, "Пользователи", "Клиенты системы Тёплый дом")
+' Дома
+osa_site_neighbourhood(houses, "Дома",  "<$osa_ics_thermometer> Подключенные дома с отоплением и датчиками температуры", "Сейчас датчики есть только в половине домов.") 
+' Система компаниии "Тёплый дом"
+System(WarmHouse, "Управление устройствами\n\nСистема компании Тёплый дом", "Приложение компании позволяет только включать/выключать отопление в доме и проверять температуру.")
+
+Rel(users, WarmHouse, "Смотрят текущую температуру в своих домах", "Через веб-интерфейс")
+Rel(WarmHouse, houses, "Отправляет запросы", "к системе отопления и датчикам температуры")
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+title Диаграмма кода системы "Тёплый дом" — C4 Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class AAAService {
+  +String name
+  +String email
+  +void register()
+  +void login()
+}
+
+class ProfileService {
+  +String user
+  +void addDevice()
+  +void removeDevice()
+  +void editDevice()
+  +void addScript()
+  +void removeScript()
+  +void editScript()
+  +void addSubscription()
+  +void removeSubscription()
+  +void editSubscription()
+}
+
+class DevicesService {
+  +Device devices[]
+  +Result runCommand(Device device)
+}
+
+class Device {
+  +string socket
+  +Settings settings
+}
+
+class Server {
+    +Result handleRequest()
+}
+
+DevicesService "1" -- "0..*" Device : has
+DevicesService  --  Server : calls
+ProfileService  --  Server : calls
+AAAService  --  Server : calls
+@enduml
+

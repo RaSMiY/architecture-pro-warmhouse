@@ -1,0 +1,45 @@
+@startuml
+title Диаграмма контейнеров системы "Тёплый дом" — C4 Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+hide stereotype
+!define osaPuml https://raw.githubusercontent.com/Crashedmind/PlantUML-opensecurityarchitecture2-icons/master
+!include osaPuml/Common.puml
+!include osaPuml/User/all.puml
+!include osaPuml/Hardware/all.puml
+!include osaPuml/Misc/all.puml
+!include osaPuml/Server/all.puml
+!include osaPuml/Site/all.puml
+
+Person(Users, "<$osa_user_large_group> Пользователи", "Клиенты системы Тёплый дом")
+
+Container_Boundary(WarmHouse, "Система компании Тёплый дом") {
+  Container(WarmHouseApp, "Интерфейс приложения Тёплый дом") {
+    Container(AAAService, "<$osa_id_card>", "Аутентификация, Авторизация, Аккаунтинг", "Проверка личности, права доступа, платежи.")
+    Container(ProfileService, "Личный кабинет пользователя.", "Angular", "Подключение устройств, домов, создание сценариев, настройка подписок, платежей.")
+    Container(DevicesService, "Панель управления устройствами.", "Angular", "Отображает текущее состояние. Позволяет совершать действия.")
+  }
+  Container(Server, "<$osa_server_web>", "Go", "Взаимодействие с базой данных, внешними устройствами, банковскими системами.")
+  Container(Database, "<$osa_database>", "PostgreSQL", "Хранит данные о пользователях, домах, устройствах, сценарии, платёжные реквизиты.")
+}
+
+System_Ext(Houses, "Дома", "<$osa_site_neighbourhood> <$osa_ics_thermometer> Подключенные дома с отоплением и датчиками температуры.\n<b>Сейчас датчики есть только в половине домов.</b>")
+System_Ext(DevicesAPI, "API устройств", "Протокол взаимодействия с устройствами")
+System_Ext(bank, "Банкинг", "Взаимодействие с банками")
+
+Rel(Users, WarmHouse, "Подключаются к системе Тёплый дом", "Управляют умными устройствами в своих домах, через веб-интерфейс")
+Rel(WarmHouse, AAAService, "Смотрят текущую температуру в своих домах", "Через веб-интерфейс")
+Rel(AAAService, ProfileService, "Пропускает зарегистрированных пользователей на страницу", "Через веб-интерфейс")
+Rel(AAAService, Server, "Спрашивает у сервера есть ли такой пользователь.", "Если есть - получает токен на сессию и права доступа.")
+Rel(ProfileService, Server, "Вызов внутреннего API подключения/отключения устройств, настроек кабинета.", "Взаимодействие с устройствами идёт только через сервер.")
+Rel(ProfileService, DevicesService, "Отображение панели устройств в личном кабинете.")
+Rel(DevicesService, Server, "Вызов внутреннего API управления устройствами", "Взаимодействие с устройствами идёт только через сервер.")
+Rel(DevicesService, DevicesAPI, "Запросы к устройствам", "к внешнему API устройств")
+Rel(Server, Database, "Сохраняет сведения о пользователях, домах, устройствах", "...")
+Rel(DevicesAPI, Houses, "Отсылает команды устройствам", "установленным в домах пользователей")
+Rel(Server, bank, "Обрабатывает платежи")
+@enduml
+
